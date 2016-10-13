@@ -23,7 +23,7 @@ app.use(session({
   secret: 'foo',
   resave: false,
   saveUninitialized: false,
-  store: new MongoStore({ mongooseConnection: mongoose.connection}),      // use the mongoose connection to store session
+  //store: new MongoStore({ mongooseConnection: mongoose.connection}),      // use the mongoose connection to store session
 }));
 
 app.engine('hbs', hbs({extname:'hbs', defaultLayout:'layout.hbs',layoutsDir: __dirname + '/views/layouts'}));
@@ -42,9 +42,12 @@ app.use(express.static(path.join(__dirname, 'node_modules')));
  
 //controllers
 const index =  require('./controllers/index'); 
-const book =   require('./controllers/book');
+const book =   require('./controllers/books');
 const user =   require('./controllers/user'); 
-const api =    require('./controllers/api');
+const login = require('./controllers/login');
+const logout = require('./controllers/logout');
+const login_logout = require('./controllers/login-logout');
+//const api =    require('./controllers/api');
  
 
 // Express Session
@@ -89,10 +92,18 @@ app.use(function (req, res, next) {
 
 //controllers
 app.use(index); 
-app.use(book);
-app.use(user);
-app.use('/users', api.showUsers);   
-app.use('/books', api.showBooks);
+//app.use(book);
+//app.use(login_logout);
+app.use(login);
+app.use(logout);
+app.use('/newBookForm', book.render);  
+app.use('/book/new', book.create); 
+app.use('/book/show', book.show); 
+app.use('/user/signup', user.index);
+app.use('/user/new', user.create);
+ app.use('/user/login', login_logout.login);
+// app.use('/user/authenticate', login_logout.authenticateUser);
+//app.use('/books', api.showBooks);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

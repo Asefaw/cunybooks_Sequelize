@@ -1,52 +1,59 @@
-const mongoose = require('mongoose');
-const db = require('../database/db'); // for db connection
+const bcrypt = require('bcryptjs');
+//const models = require('../models');
 
- 
-
-const Book = mongoose.Schema({
-	owner: {
-		type: String
-	},
-	title: {
-		type: String, 
-		required: true, 
-		lowercase: true
-	},
-	isbn: {
-		type: String, 
-		required: true
-	},
-	author: {
-		type: String
-	},
-	edition: {
-		type: String
-	},
-	price: {
-		type: Number
-	}, 
-	quantity: {
-		type: String
-	}
-});
-
-module.exports = mongoose.model('Book', Book);
-
-module.exports.saveNewBook = function(newBook, callback){  
-	newBook.save(callback); 
-}
-
-module.exports.findBooksByISBN = function(isbn, callback){
-	var query = {isbn: isbn};
-	Book.findOne(query,callback);
-}
-
-module.exports.findBooksByTitle = function(title, callback){
-	var query = {title: title};
-	Book.findOne(query,callback);
-}
-
-module.exports.getUserByOwner = function(owner, callback){
-	var query = {owner: owner};
-	return Book.findOne(query, callback);
-}
+module.exports = function(sequelize, DataTypes) {
+  const Book = sequelize.define('Book', {
+    title: {   	
+      	type: DataTypes.STRING,
+      	allowNull: false,
+      	validate: {
+        	notEmpty: true,
+      	},
+    }, 
+    isbn: {
+      	type: DataTypes.STRING,
+      	allowNull: false,
+      	unique: true,
+      	validate: {
+        	notEmpty: true, 
+      	},
+    },
+    edition: {
+      	type: DataTypes.STRING,
+      	allowNull: false,
+      	validate: {
+        	notEmpty: true,
+      	},
+    },
+     author: {
+      	type: DataTypes.STRING,
+      	allowNull: false,
+      	validate: {
+        	notEmpty: true,
+      },
+    },
+    price: {
+      	type: DataTypes.DOUBLE,
+      	allowNull: false,
+      	validate: {
+        	notEmpty: true,
+      	},
+    },
+    quantity: {
+      	type: DataTypes.INTEGER,
+      	allowNull: false,
+      	validate: {
+        	notEmpty: true,
+      	},
+    },
+  },{
+    classMethods: {
+    	associate: function(models){
+    		Book.belongsTo(models.User, {
+    			onDelete: 'cascade'
+    		});
+    	}		   
+    }
+    }); 
+  return Book;
+};

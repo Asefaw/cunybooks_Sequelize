@@ -1,47 +1,52 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const db = require('../database/db');
+ const bcrypt = require('bcryptjs');
+ //const models = require('../models');
 
-// User Schema
-var userSchema = mongoose.Schema({ 
-	fullName: {
-		type: String
-	}, 
-	email: {
-		type:String,
-        required: true,
-        unique: true
-	}, 	
-	password: {
-		type: String
-	},
-	college: {
-		type: String
-	}
-});
-
-var User = module.exports = mongoose.model('User', userSchema);
-
-module.exports.createUser = function(newUser, callback){
-	bcrypt.genSalt(10, function(err, salt) {
-	    bcrypt.hash(newUser.password, salt, function(err, hash) {
-	        newUser.password = hash;
-	        newUser.save(callback);
-	    });
-	});
-}
-
-module.exports.getUserByEmail = function(email, callback){
-	var query = {email: email};
-	User.findOne(query, callback);
-}
-module.exports.getUserById= function(id, callback){ 
-	User.findById(id, callback);
-}
-
-module.exports.validatePassword= function(password, hash, callback){
-	bcrypt.compare(password, hash, function(err, isMatch){
-		if(err) throw err;
-		callback(null, isMatch);
-	});
-} 
+module.exports = function(sequelize, DataTypes) {
+  const User = sequelize.define('User', {
+    fullName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    }, 
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        notEmpty: true,
+        isEmail: true,
+      },
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+     college: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+  },{
+    classMethods: {
+      generateHash: function(password) {
+          return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+      },
+      validPassword: function(password) {
+          return bcrypt.compareSync(password, this.password);
+      },
+      associate: function(models){
+        User.hasMany(models.Book, {
+          onDelete: 'cascade'
+        });
+      }
+    }
+    }); 
+  return User;
+};

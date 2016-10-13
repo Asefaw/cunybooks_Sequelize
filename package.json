@@ -22,6 +22,7 @@
     "express-session": "*",
     "express-validator": "*",
     "jquery": "^3.1.0",
+    "method-override": "2.3.6",
     "mocha": "^3.0.2",
     "mongoose": "^4.6.1",
     "morgan": "~1.7.0",
@@ -31,6 +32,9 @@
     "passport-local": "*",
     "passport-local-mongoose": "^4.0.0",
     "passport-mongoose": "0.0.1",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.24.3",
+    "sequelize-cli": "^2.4.0",
     "serve-favicon": "~2.3.0"
   }
 }
